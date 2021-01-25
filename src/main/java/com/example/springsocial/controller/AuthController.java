@@ -1,6 +1,6 @@
 package com.example.springsocial.controller;
 
-import com.example.springsocial.exception.BadRequestException;
+import com.example.springsocial.exception.unchecked.BadRequestException;
 import com.example.springsocial.model.AuthProvider;
 import com.example.springsocial.model.User;
 import com.example.springsocial.payload.ApiResponse;
@@ -76,7 +76,7 @@ public class AuthController {
                 .buildAndExpand(result.getId()).toUri();
 
         return ResponseEntity.created(location)
-                .body(new ApiResponse(true, "User registered successfully@"));
+                .body(new ApiResponse(true, "User registered successfully"));
     }
 
 }

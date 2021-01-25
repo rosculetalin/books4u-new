@@ -1,4 +1,4 @@
-package com.example.springsocial.exception;
+package com.example.springsocial.exception.unchecked;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

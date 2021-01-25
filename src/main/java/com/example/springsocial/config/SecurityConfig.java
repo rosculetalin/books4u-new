@@ -14,6 +14,7 @@ import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,6 +33,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 @EnableConfigurationProperties(AppProperties.class)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -112,6 +120,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js")
                         .permitAll()
                     .antMatchers("/auth/**", "/oauth2/**")
+                        .permitAll()
+                    .antMatchers(AUTH_WHITELIST)
                         .permitAll()
                     .anyRequest()
                         .authenticated()
