@@ -1,18 +1,20 @@
 package com.example.springsocial.model;
 
-import com.example.springsocial.model.compositeKey.UserRelationshipKey;
-import lombok.Getter;
-import lombok.Setter;
+import com.example.springsocial.model.compositeKey.UsersKey;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "user_relationship")
 public class UserRelationship {
     @EmbeddedId
-    private UserRelationshipKey id;
+    private UsersKey id;
 
     @ManyToOne
     @MapsId("userSenderId")

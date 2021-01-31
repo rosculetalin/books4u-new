@@ -1,9 +1,6 @@
 package com.example.springsocial.model.compositeKey;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -15,7 +12,8 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRelationshipKey implements Serializable {
+@Builder
+public class UsersKey implements Serializable {
     @Column(name = "user_sender_id")
     private Long userSenderId;
     @Column(name = "user_receiver_id")
@@ -24,13 +22,13 @@ public class UserRelationshipKey implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserRelationshipKey)) return false;
+        if (!(o instanceof UsersKey)) return false;
 
-        UserRelationshipKey userRelationshipKey = (UserRelationshipKey) o;
+        UsersKey usersKey = (UsersKey) o;
 
-        if (!Objects.equals(userSenderId, userRelationshipKey.userSenderId))
+        if (!Objects.equals(userSenderId, usersKey.userSenderId))
             return false;
-        return Objects.equals(userReceiverId, userRelationshipKey.userReceiverId);
+        return Objects.equals(userReceiverId, usersKey.userReceiverId);
     }
 
     @Override

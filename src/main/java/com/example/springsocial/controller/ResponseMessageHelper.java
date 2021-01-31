@@ -13,6 +13,7 @@ public final class ResponseMessageHelper {
     static HttpStatus C500 = HttpStatus.valueOf(500);
 
     static String ID_USERS_NOT_PARSED = "Id for user {0} or/and {1} could not be parsed to long";
+    static String ID_USER_NOT_PARSED = "Id for user {0} could not be parsed to long";
     static String USER_NOT_FOUND = "User sender with id {0} could not be found.";
 
     static String CHAT_NOT_FOUND = "The chat between user {0} and user {1} could not be found.";
@@ -31,6 +32,9 @@ public final class ResponseMessageHelper {
     static String USER_BOOK_CREATED = "The book has been added to the user.";
 
     static String MESSAGE_CREATED = "The message has been created.";
+
+    static String USER_RELATIONSHIP_NOT_FOUND = "It is no relationship between {0} and {1}.";
+    static String USER_RELATIONSHIP_CREATED = "The relationship has been created.";
 
     static ResponseEntity<?> getResponseEntity(boolean success, String message, HttpStatus status){
         return new ResponseEntity<>(new ApiResponse(success, message), status);

@@ -2,7 +2,7 @@ package com.example.springsocial.controller;
 
 import com.example.springsocial.model.Chat;
 import com.example.springsocial.model.User;
-import com.example.springsocial.model.compositeKey.ChatKey;
+import com.example.springsocial.model.compositeKey.UsersKey;
 import com.example.springsocial.repository.*;
 
 import java.util.Optional;
@@ -43,8 +43,8 @@ public class ChatController {
         Chat chat = new Chat();
         chat.setUserSender(optionalUserSender.get());
         chat.setUserReceiver(optionalUserReceiver.get());
-        ChatKey chatKey = new ChatKey(optionalUserSender.get().getId(), optionalUserReceiver.get().getId());
-        chat.setId(chatKey);
+        UsersKey usersKey = new UsersKey(optionalUserSender.get().getId(), optionalUserReceiver.get().getId());
+        chat.setId(usersKey);
         chatRepository.save(chat);
         return getResponseEntity(true, CHAT_CREATED, C201);
     }
@@ -66,8 +66,8 @@ public class ChatController {
         if(!optionalUserReceiver.isPresent()){
             return getResponseEntity(false, format(USER_NOT_FOUND, userReceiver), C404);
         }
-        ChatKey chatKey = new ChatKey(optionalUserSender.get().getId(), optionalUserReceiver.get().getId());
-        Optional<Chat> optionalChat = chatRepository.findById(chatKey);
+        UsersKey usersKey = new UsersKey(optionalUserSender.get().getId(), optionalUserReceiver.get().getId());
+        Optional<Chat> optionalChat = chatRepository.findById(usersKey);
         if(!optionalChat.isPresent()){
             return getResponseEntity(false, format(CHAT_NOT_FOUND, userSender, userReceiver), C404);
         }

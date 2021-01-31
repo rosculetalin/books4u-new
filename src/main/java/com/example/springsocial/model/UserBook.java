@@ -23,4 +23,7 @@ public class UserBook {
     @MapsId("bookId")
     @JoinColumn(name = "book_id")
     private Book book;
+
+    private boolean publicVisibility;
+    private boolean openForOffers;
 }

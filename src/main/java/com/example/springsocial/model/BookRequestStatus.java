@@ -1,6 +1,6 @@
 package com.example.springsocial.model;
 
-public enum RelationshipStatus {
+public enum BookRequestStatus {
     pending,
     accepted,
     refused

@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class MessageDto {
     @NotNull
-    private ChatKeyDto chatId;
+    private UsersKeyDto chatId;
     @NotNull
     private Boolean isSender;
     @NotNull

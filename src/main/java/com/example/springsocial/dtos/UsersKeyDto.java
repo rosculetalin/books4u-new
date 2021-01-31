@@ -5,9 +5,9 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class ChatKeyDto {
+public class UsersKeyDto {
     @NotNull
-    private Long userSenderId;
+    Long senderId;
     @NotNull
-    private Long userReceiverId;
+    Long receiverId;
 }

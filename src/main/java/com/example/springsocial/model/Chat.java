@@ -1,6 +1,6 @@
 package com.example.springsocial.model;
 
-import com.example.springsocial.model.compositeKey.ChatKey;
+import com.example.springsocial.model.compositeKey.UsersKey;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Table(name = "chat")
 public class Chat {
     @EmbeddedId
-    private ChatKey id;
+    private UsersKey id;
 
     @ManyToOne
     @MapsId("userSenderId")

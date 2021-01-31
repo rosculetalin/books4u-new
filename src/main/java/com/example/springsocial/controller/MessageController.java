@@ -5,7 +5,7 @@ import com.example.springsocial.dtos.MessageDto;
 import com.example.springsocial.model.Chat;
 import com.example.springsocial.model.Message;
 import com.example.springsocial.model.User;
-import com.example.springsocial.model.compositeKey.ChatKey;
+import com.example.springsocial.model.compositeKey.UsersKey;
 import com.example.springsocial.repository.*;
 
 import lombok.RequiredArgsConstructor;
@@ -31,10 +31,10 @@ public class MessageController {
 
     @PostMapping("/message")
     public ResponseEntity<?> addMessage(@RequestBody @Valid MessageDto messageDto) throws MethodArgumentNotValidException {
-        ChatKey chatKey = new ChatKey(messageDto.getChatId().getUserSenderId(), messageDto.getChatId().getUserReceiverId());
-        Optional<Chat> optionalChat = chatRepository.findById(chatKey);
+        UsersKey usersKey = new UsersKey(messageDto.getChatId().getSenderId(), messageDto.getChatId().getReceiverId());
+        Optional<Chat> optionalChat = chatRepository.findById(usersKey);
         if(!optionalChat.isPresent()){
-            return getResponseEntity(false, String.format(CHAT_NOT_FOUND, chatKey.getUserReceiverId(), chatKey.getUserSenderId()), C404);
+            return getResponseEntity(false, String.format(CHAT_NOT_FOUND, usersKey.getUserReceiverId(), usersKey.getUserSenderId()), C404);
         }
         Message message = new Message();
         message.setChat(optionalChat.get());
@@ -61,14 +61,14 @@ public class MessageController {
         if(!optionalUserReceiver.isPresent()){
             return getResponseEntity(false, format(USER_NOT_FOUND, userReceiver), C404);
         }
-        ChatKey chatKeySenderCase = new ChatKey(optionalUserSender.get().getId(), optionalUserReceiver.get().getId());
-        Optional<Chat> optionalChatSenderCase = chatRepository.findById(chatKeySenderCase);
+        UsersKey usersKeySenderCase = new UsersKey(optionalUserSender.get().getId(), optionalUserReceiver.get().getId());
+        Optional<Chat> optionalChatSenderCase = chatRepository.findById(usersKeySenderCase);
         List<MessageConversationDto> messages;
         if(!optionalChatSenderCase.isPresent()){
-            ChatKey chatKeyReceiverCase = new ChatKey();
-            chatKeyReceiverCase.setUserSenderId(optionalUserReceiver.get().getId());
-            chatKeyReceiverCase.setUserReceiverId(optionalUserSender.get().getId());
-            Optional<Chat> optionalChatReceiverCase = chatRepository.findById(chatKeyReceiverCase);
+            UsersKey usersKeyReceiverCase = new UsersKey();
+            usersKeyReceiverCase.setUserSenderId(optionalUserReceiver.get().getId());
+            usersKeyReceiverCase.setUserReceiverId(optionalUserSender.get().getId());
+            Optional<Chat> optionalChatReceiverCase = chatRepository.findById(usersKeyReceiverCase);
             if(!optionalChatReceiverCase.isPresent()){
                 return getResponseEntity(false, format(CHAT_NOT_FOUND, userSender, userReceiver), C404);
             } else {

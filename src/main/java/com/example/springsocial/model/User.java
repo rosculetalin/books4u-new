@@ -3,17 +3,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email")
+@UniqueConstraint(columnNames = "email")
 })
 public class User {
     @Id
@@ -40,4 +47,5 @@ public class User {
     private AuthProvider provider;
 
     private String providerId;
+
 }
