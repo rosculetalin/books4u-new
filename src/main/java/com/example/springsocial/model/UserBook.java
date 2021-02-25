@@ -28,4 +28,6 @@ public class UserBook {
 
     private boolean publicVisibility;
     private boolean openForOffers;
+    private boolean favorites;
+    private boolean wantToRead;
 }

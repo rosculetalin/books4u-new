@@ -26,6 +26,7 @@ public final class ResponseMessageHelper {
     static String ID_BOOK_NOT_PARSED = "Id for book {0} could not be parsed to long value.";
     static String BOOK_NOT_FOUND = "Book with id {0} could not be found.";
     static String BOOK_CREATED = "The book has been created.";
+    static String BOOK_DELETED = "The book has been deleted.";
 
     static String ID_USER_BOOK_NOT_PARSED = "Id for book {0} or id for user {1} could not be parsed to long.";
     static String USER_BOOK_DUPLICATE = "The book may be already in database";
@@ -43,6 +44,7 @@ public final class ResponseMessageHelper {
     static String POST_CREATED = "The post has been created.";
 
     static String IMAGE_NOT_FOUND = "The user {0} has not a profile image.";
+    static String IMAGE_FORMAT_INVALID = "The format of image must be jpeg.";
 
     static ResponseEntity<?> getResponseEntity(boolean success, String message, HttpStatus status){
         return new ResponseEntity<>(new ApiResponse(success, message), status);

@@ -1,6 +1,8 @@
 package com.example.springsocial.controller;
 
 import com.example.springsocial.dtos.BookDto;
+import com.example.springsocial.dtos.UserBookDto;
+import com.example.springsocial.info.BookInfo;
 import com.example.springsocial.model.Author;
 import com.example.springsocial.model.Book;
 import com.example.springsocial.model.User;
@@ -16,7 +18,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.springsocial.controller.ResponseMessageHelper.*;
@@ -34,6 +40,8 @@ public class BookController {
 
     private final UserBookRepository userBookRepository;
 
+    private final EntityManager entityManager;
+
     @PostMapping("/book")
     public ResponseEntity<?> addBook(@RequestBody @Valid BookDto bookDto) throws MethodArgumentNotValidException {
         Book book = Book.builder().name(bookDto.getName()).description(bookDto.getDescription()).build();
@@ -48,8 +56,25 @@ public class BookController {
         } else {
             additionalMessage = format(AUTHOR_NOT_FOUND, bookDto.getAuthorId());
         }
+        book.setImagePresent(true);
         bookRepository.save(book);
         return getResponseEntity(true, BOOK_CREATED + additionalMessage, C201);
+    }
+
+    @DeleteMapping("/book/{id}")
+    public ResponseEntity<?> deleteBook(@PathVariable String id){
+        long bookId;
+        try {
+            bookId = Long.parseLong(id);
+        }catch(NumberFormatException e){
+            return getResponseEntity(false, format(ID_BOOK_NOT_PARSED, id), C400);
+        }
+        Optional<Book> optionalBook = bookRepository.findById(bookId);
+        if(!optionalBook.isPresent()){
+            return getResponseEntity(false, format(BOOK_NOT_FOUND, id), C404);
+        }
+        bookRepository.delete(optionalBook.get());
+        return getResponseEntity(true, BOOK_DELETED, C200);
     }
 
     @GetMapping("/book/{id}")
@@ -67,28 +92,53 @@ public class BookController {
         return new ResponseEntity<>(optionalBook.get(), HttpStatus.valueOf(200));
     }
 
-    @PostMapping("/book/{id}")
-    public ResponseEntity<?> addBookToUser(@PathVariable String id, @RequestParam String userId) {
-        long bookIdentifier, userIdentifier;
+    @GetMapping("/book/all/byUser/{id}")
+    public ResponseEntity<?> getAllBooksOfUser(@PathVariable String id){
+        long userId;
         try {
-            bookIdentifier = Long.parseLong(id);
-            userIdentifier = Long.parseLong(userId);
+            userId = Long.parseLong(id);
         }catch(NumberFormatException e){
-            return getResponseEntity(false, format(ID_USER_BOOK_NOT_PARSED, id, userId), C400);
+            return getResponseEntity(false, format(ID_USER_NOT_PARSED, id), C400);
         }
-        Optional<Book> optionalBook = bookRepository.findById(bookIdentifier);
-        Optional<User> optionalUser = userRepository.findById(userIdentifier);
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if(!optionalUser.isPresent()){
+            return getResponseEntity(false, format(USER_NOT_FOUND, id), C404);
+        }
+        Query query = entityManager.createQuery("SELECT new com.example.springsocial.info.BookInfo(" +
+                "b.id , b.name, b.description, " +
+                "ub.publicVisibility, ub.openForOffers, ub.wantToRead, ub.favorites, " +
+                "a.id, a.name, a.description) FROM Book b " +
+                "JOIN UserBook ub ON b.id = ub.book " +
+                "JOIN Author a ON b.author = a.id");
+        List<BookInfo> bookInfoList = query.getResultList();
+        return new ResponseEntity<>(bookInfoList, C200);
+    }
+
+    @GetMapping("/book/all/")
+    public ResponseEntity<?> getAllBooksOfUser(){
+        List<Book> bookList = bookRepository.findAll();
+        return new ResponseEntity<>(bookList, C200);
+    }
+
+    @PostMapping("/book/user/")
+    public ResponseEntity<?> addBookToUser(@RequestBody @Valid UserBookDto userBookDto) {
+        Optional<Book> optionalBook = bookRepository.findById(userBookDto.getBookId());
+        Optional<User> optionalUser = userRepository.findById(userBookDto.getUserId());
         if(!optionalBook.isPresent()){
-            return getResponseEntity(false, format(BOOK_NOT_FOUND, id), C404);
+            return getResponseEntity(false, format(BOOK_NOT_FOUND, userBookDto.getBookId()), C404);
         }
         if(!optionalUser.isPresent()){
-            return getResponseEntity(false, format(USER_NOT_FOUND, userId), C404);
+            return getResponseEntity(false, format(USER_NOT_FOUND, userBookDto.getUserId()), C404);
         }
         UserBook userBook = new UserBook();
         userBook.setUser(optionalUser.get());
         userBook.setBook(optionalBook.get());
-        UserBookKey userBookKey = new UserBookKey(optionalUser.get().getId(), optionalUser.get().getId());
+        UserBookKey userBookKey = new UserBookKey(optionalUser.get().getId(), optionalBook.get().getId());
         userBook.setId(userBookKey);
+        userBook.setPublicVisibility(userBookDto.getPublicVisibility());
+        userBook.setOpenForOffers(userBookDto.getOpenForOffers());
+        userBook.setFavorites(userBookDto.getFavorites());
+        userBook.setWantToRead(userBookDto.getWantToRead());
         try{
             userBookRepository.save(userBook);
         }catch (Exception e){

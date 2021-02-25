@@ -21,6 +21,8 @@ public class Book {
 
     private String description;
 
+    private Boolean imagePresent;
+
     @OneToOne
     @JoinColumn(name = "author_id")
     private Author author;

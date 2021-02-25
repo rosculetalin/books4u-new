@@ -1,6 +1,7 @@
 package com.example.springsocial.controller;
 
 import com.example.springsocial.model.User;
+import com.example.springsocial.repository.BookRepository;
 import com.example.springsocial.repository.UserRepository;
 import com.example.springsocial.security.CurrentUser;
 import com.example.springsocial.security.UserPrincipal;
@@ -23,6 +24,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.springsocial.controller.ResponseMessageHelper.*;
@@ -34,38 +36,33 @@ import static java.text.MessageFormat.format;
 public class FileController {
 
     private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity uploadFile(@CurrentUser UserPrincipal userPrincipal, @RequestParam MultipartFile file) {
-        Optional<?> optionalUser = userRepository.findById(userPrincipal.getId());
+    @PostMapping(value = "/uploadImageProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity uploadImageProfile(@CurrentUser UserPrincipal userPrincipal, @RequestParam MultipartFile file) {
+        Optional<User> optionalUser = userRepository.findById(userPrincipal.getId());
         if(!optionalUser.isPresent()){
             return getResponseEntity(false, format(USER_NOT_FOUND, userPrincipal.getId()), C404);
         }
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if(!"jpeg".equals(extension)){
+            return getResponseEntity(false, IMAGE_FORMAT_INVALID, C400);
+        }
         try{
-            String originalName = file.getOriginalFilename();
-            String extensie = FilenameUtils.getExtension(file.getOriginalFilename());
-            System.out.println(extensie);
-            if(originalName != null){
-                String[] extension = originalName.split("\\.");
-                String folder = "/photos_book4u/profile/";
-                byte[] bytes = file.getBytes();
-                Path path = Paths.get(folder + userPrincipal.getId() + "." + extension[1]);
-                Files.write(path, bytes);
-            } else {
-                throw new RuntimeException("Name of file invalid");
-            }
+            String folder = "/photos_book4u/profile/";
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get(folder + userPrincipal.getId() + "." + extension);
+            Files.write(path, bytes);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+        optionalUser.get().setImagePresent(true);
+        userRepository.save(optionalUser.get());
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(
-            value = "/getImage",
-            produces = MediaType.IMAGE_JPEG_VALUE
-    )
-    public @ResponseBody byte[] getFile(@CurrentUser UserPrincipal userPrincipal) throws Exception{
-
+    @GetMapping(value = "/getImageProfile", produces = MediaType.IMAGE_JPEG_VALUE)
+    public @ResponseBody byte[] getImageProfile(@CurrentUser UserPrincipal userPrincipal) throws Exception{
         Optional<User> optionalUser = userRepository.findById(userPrincipal.getId());
         if(!optionalUser.isPresent()){
             throw new ResponseStatusException(C404, format(USER_NOT_FOUND, userPrincipal.getId()));
@@ -74,13 +71,11 @@ public class FileController {
         if(!user.getImagePresent() && user.getImageUrl() == null){
             throw new ResponseStatusException(C404, format(IMAGE_NOT_FOUND, userPrincipal.getId()));
         }
-
-        if("local".equals(user.getProvider().toString()) ||
-                ("facebook".equals(user.getProvider().toString()) && user.getImagePresent())){
+        if(user.getImagePresent() && ("local".equals(user.getProvider().toString()) ||
+                "facebook".equals(user.getProvider().toString()))){
             String path = "/photos_book4u/profile/" + userPrincipal.getId() + ".jpeg";
             return Files.readAllBytes(Paths.get(path));
         }
-
         if("facebook".equals(user.getProvider().toString())){
             URL imageUrl = new URL(user.getImageUrl());
             BufferedImage image = ImageIO.read(imageUrl);
@@ -89,9 +84,25 @@ public class FileController {
             byteArrayOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
         }
-
         throw new ResponseStatusException(C500, format(IMAGE_NOT_FOUND, userPrincipal.getId()));
     }
+
+    @GetMapping(value = "/getImageBook/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public @ResponseBody byte[] getImageBook(@PathVariable String id) throws Exception{
+        long bookId;
+        try {
+            bookId = Long.parseLong(id);
+        }catch(NumberFormatException e){
+            throw new ResponseStatusException(C400, format(ID_BOOK_NOT_PARSED, id));
+        }
+        Optional<?> optionalBook = bookRepository.findById(bookId);
+        if(!optionalBook.isPresent()){
+            throw new ResponseStatusException(C404, format(BOOK_NOT_FOUND, id));
+        }
+        String path = "/photos_book4u/book/" + id + ".jpeg";
+        return Files.readAllBytes(Paths.get(path));
+    }
+
 
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver multipartResolver() {
