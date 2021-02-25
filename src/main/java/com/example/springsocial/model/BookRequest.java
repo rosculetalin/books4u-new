@@ -1,13 +1,15 @@
 package com.example.springsocial.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "book_request")
 public class BookRequest {
     @Id

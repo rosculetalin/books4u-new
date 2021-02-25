@@ -30,11 +30,19 @@ public final class ResponseMessageHelper {
     static String ID_USER_BOOK_NOT_PARSED = "Id for book {0} or id for user {1} could not be parsed to long.";
     static String USER_BOOK_DUPLICATE = "The book may be already in database";
     static String USER_BOOK_CREATED = "The book has been added to the user.";
+    static String USER_BOOK_NOT_FOUND = "The book {0} of user {1} could not be found.";
+    static String USER_BOOK_EMPTY = "The user does not have any books.";
+
+    static String BOOK_REQUEST_CREATED = "The book request has been created.";
 
     static String MESSAGE_CREATED = "The message has been created.";
 
     static String USER_RELATIONSHIP_NOT_FOUND = "It is no relationship between {0} and {1}.";
     static String USER_RELATIONSHIP_CREATED = "The relationship has been created.";
+
+    static String POST_CREATED = "The post has been created.";
+
+    static String IMAGE_NOT_FOUND = "The user {0} has not a profile image.";
 
     static ResponseEntity<?> getResponseEntity(boolean success, String message, HttpStatus status){
         return new ResponseEntity<>(new ApiResponse(success, message), status);

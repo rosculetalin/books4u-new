@@ -5,6 +5,8 @@ import com.example.springsocial.config.SwaggerConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication

@@ -1,9 +1,6 @@
 package com.example.springsocial.model.compositeKey;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -13,6 +10,7 @@ import java.util.Objects;
 @Embeddable
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserBookKey implements Serializable {

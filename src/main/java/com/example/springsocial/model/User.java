@@ -34,7 +34,11 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    private String location;
+
     private String imageUrl;
+
+    private Boolean imagePresent;
 
     @Column(nullable = false)
     private Boolean emailVerified = false;
